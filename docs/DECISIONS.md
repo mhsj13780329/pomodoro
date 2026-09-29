@@ -2,7 +2,7 @@
 
 Status: Accepted. Implementation begins at Milestone 0 (see `MILESTONES.md`).
 
-Guiding constraints: `AGENTS.md` (minimal dependencies, simple architecture, timer independence, local-first) and `docs/PRODUCT_SPEC.md` (source of truth). Versions are intentionally not pinned here; pin the current stable releases at scaffold time.
+Guiding constraints: `AGENTS.md` (minimal dependencies, simple architecture, timer independence, local-first) and `docs/PRD.md` (source of truth). Versions are intentionally not pinned here; pin the current stable releases at scaffold time.
 
 Runtime dependency budget for V1: `next`, `react`, `react-dom`, one Jalali conversion library. Nothing else at runtime unless a milestone justifies it in this file.
 
@@ -71,7 +71,7 @@ Runtime dependency budget for V1: `next`, `react`, `react-dom`, one Jalali conve
 - SSR: repositories are only touched from Client Components in effects. There must be no server read of `localStorage`.
 
 **Alternative considered:** IndexedDB (raw API, or the small `idb` wrapper).
-**Tradeoff:** IndexedDB scales better and is asynchronous natively, but has a heavier API, needs more testing setup (fake-indexeddb), and is overkill at expected volume. Estimate: 20 sessions/day * ~150 B * 365 = about 1.1 MB/year. Month bucketing keeps that workable for years. The risk is a user who logs heavy multi-year history; the async repository interface lets us migrate storage later without touching the UI. Revisit if a year of data exceeds about 2 MB.
+**Tradeoff:** IndexedDB scales better and is asynchronous natively, but has a heavier API, needs more testing setup (fake-indexeddb), and is overkill at expected volume. Estimate: 20 sessions/day _ ~150 B _ 365 = about 1.1 MB/year. Month bucketing keeps that workable for years. The risk is a user who logs heavy multi-year history; the async repository interface lets us migrate storage later without touching the UI. Revisit if a year of data exceeds about 2 MB.
 
 ---
 
@@ -151,3 +151,10 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Accessibility contrast:** WCAG AA in both themes and both directions.
 - **Not in V1 (not specified by the PRD):** tab-title timer display, data export or clear, analytics, cross-tab live sync.
 - **Analog visualization:** required by the PRD but missing from its milestone list, so it is Milestone 14.
+
+## M0 scaffold notes
+
+- **TypeScript 6.0.3, not 7.x:** `typescript-eslint` (used by `eslint-config-next`) refuses to run on TypeScript 7.0. Pinned to the newest 6.x. Revisit when typescript-eslint supports TS 7.1 or later.
+- **ESLint 9.39.4, not 10.x:** `eslint-plugin-react` (pulled in by `eslint-config-next`) crashes on ESLint 10 (`context.getFilename is not a function`). Pinned to ESLint 9. Revisit when the plugin supports ESLint 10.
+- **Test files are excluded from `tsconfig.domain.json`:** the project has `types: []` and no DOM, so `vitest` imports would not resolve. Tests are type-checked by `tsconfig.json`. Domain source files remain checked without DOM or Node types.
+- **`agentRules: false` in `next.config.ts`:** `next dev` otherwise appends its own block to `AGENTS.md` on every run.

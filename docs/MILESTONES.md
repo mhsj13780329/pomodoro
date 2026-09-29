@@ -24,7 +24,7 @@ Deviations from the PRD's ordering, and why:
 
 Goal: an empty but correct project with the quality gates in place.
 
-Scope: Next.js (App Router, TypeScript strict, Tailwind), pnpm, Vitest, ESLint with the boundary rules from `docs/ARCHITECTURE.md` section 3, `tsconfig.domain.json`, folder skeleton, `package.json` scripts (`dev`, `build`, `lint`, `typecheck`, `test`).
+Scope: Next.js (App Router, TypeScript strict, Tailwind), pnpm, Vitest, ESLint with the boundary rules from `docs/ARCHITECTURE.md` section 3, `tsconfig.domain.json`, folder skeleton, `package.json` scripts (`dev`, `build`, `lint`, `typecheck`, `test`, `test:watch`, `check`).
 
 Acceptance criteria:
 
