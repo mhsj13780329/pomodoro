@@ -19,6 +19,7 @@ import { notificationPermission, requestNotificationPermission, showNotification
 import { localTimeZone } from '@/platform/timeZone';
 import { useT } from '@/application/providers/LocaleProvider';
 import { useSettings } from '@/application/providers/SettingsProvider';
+import { useTasks } from '@/application/providers/TasksProvider';
 import { useToast } from '@/application/providers/ToastProvider';
 import { createCompletionHandler } from './completionHandler';
 import { applyDevSeconds, parseDevSeconds } from './devOverrides';
@@ -50,6 +51,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   const { settings, ready, updateSettings } = useSettings();
   const { t } = useT();
   const { showToast } = useToast();
+  const { resolveSelectedTaskId } = useTasks();
   const [engine, setEngine] = useState<TimerEngine | null>(null);
   const [persistence, setPersistence] = useState<TimerPersistence | null>(null);
   const [restoredPaused, setRestoredPaused] = useState(false);
@@ -58,6 +60,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   const tRef = useRef(t);
   const toastRef = useRef(showToast);
   const updateRef = useRef(updateSettings);
+  const resolveTaskRef = useRef(resolveSelectedTaskId);
   const devSecondsRef = useRef<number | null>(null);
   const sessionsRef = useRef<SessionRepository | null>(null);
   useEffect(() => {
@@ -65,6 +68,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
     tRef.current = t;
     toastRef.current = showToast;
     updateRef.current = updateSettings;
+    resolveTaskRef.current = resolveSelectedTaskId;
   });
 
   const configFor = useCallback(
@@ -93,7 +97,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
       sessions,
       newId,
       timeZone: localTimeZone,
-      getSelectedTaskId: () => null, // M7 supplies the selected task, checked against existing tasks
+      getSelectedTaskId: () => resolveTaskRef.current(),
       getSettings: () => settingsRef.current,
       effects: {
         playSound: playCompletionSound,

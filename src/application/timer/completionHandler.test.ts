@@ -10,6 +10,8 @@ import { createCompletionHandler } from './completionHandler';
 
 const TZ = 'UTC';
 let idSeq = 0;
+let selected: string | null = 'task1';
+const flush = () => new Promise<void>((r) => setTimeout(r, 0));
 
 function setup(overrides: Partial<UserSettings> = {}, store = new MemoryStore()) {
   const settings: UserSettings = { ...defaultSettings('en'), ...overrides };
@@ -19,7 +21,7 @@ function setup(overrides: Partial<UserSettings> = {}, store = new MemoryStore())
     sessions,
     newId: () => `id${idSeq++}`,
     timeZone: () => TZ,
-    getSelectedTaskId: () => 'task1',
+    getSelectedTaskId: async () => selected,
     getSettings: () => settings,
     effects: {
       playSound: () => calls.push('sound'),
@@ -30,7 +32,10 @@ function setup(overrides: Partial<UserSettings> = {}, store = new MemoryStore())
   const clock = new FakeClock(Date.UTC(2026, 2, 20, 10, 0));
   const config = timerConfigFromSettings(settings.timer);
   const engine = createTimerEngine({ clock, config, onEvent: handler });
-  const today = () => sessions.listByLocalDate('2026-03-20');
+  const today = async () => {
+    await flush();
+    return sessions.listByLocalDate('2026-03-20');
+  };
   return { engine, clock, calls, today, sessions, handler, config, settings };
 }
 
@@ -47,6 +52,16 @@ describe('completion handler', () => {
     expect(list).toHaveLength(1);
     expect(list[0]).toMatchObject({ taskId: 'task1', type: 'work', plannedMs: 25 * 60_000, localDate: '2026-03-20' });
     expect(calls).toEqual(['sound', 'notify', 'toast']);
+  });
+
+  it('records the task selected at completion, or none when it no longer exists', async () => {
+    selected = null;
+    const a = setup(allOn);
+    a.engine.start();
+    a.clock.advance(25 * 60_000);
+    a.engine.tick();
+    expect((await a.today())[0].taskId).toBeNull();
+    selected = 'task1';
   });
 
   it('plays only the sound when a break ends', async () => {
@@ -111,7 +126,7 @@ describe('completion handler', () => {
       sessions,
       newId: () => 'x',
       timeZone: () => TZ,
-      getSelectedTaskId: () => null,
+      getSelectedTaskId: async () => null,
       getSettings: () => ({ ...defaultSettings('en'), ...allOn }),
       effects: {
         playSound: () => {
@@ -125,6 +140,7 @@ describe('completion handler', () => {
     });
     handler({ type: 'completed', sessionType: 'work', plannedMs: 1, completedAt: Date.UTC(2026, 2, 20), restored: false });
     expect(calls).toEqual(['toast']);
+    await flush();
     expect(await sessions.listByLocalDate('2026-03-20')).toHaveLength(1);
   });
 

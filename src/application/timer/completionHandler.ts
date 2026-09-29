@@ -15,8 +15,8 @@ export interface CompletionDeps {
   sessions: SessionRepository;
   newId: IdGenerator;
   timeZone: () => string;
-  /** The task selected at the moment of completion, or null (wired to real tasks in M7). */
-  getSelectedTaskId: () => string | null;
+  /** The task selected at the moment of completion, or null when none or it no longer exists. */
+  getSelectedTaskId: () => Promise<string | null>;
   getSettings: () => UserSettings;
   effects: CompletionEffects;
 }
@@ -44,14 +44,17 @@ export function createCompletionHandler(deps: CompletionDeps): (event: TimerEven
       if (settings.notifications.sound) guard(() => deps.effects.playSound(settings.audio.volume));
     }
     if (event.sessionType !== 'work') return;
-    const session = sessionFromCompletion(event, {
-      id: deps.newId(),
-      taskId: deps.getSelectedTaskId(),
-      timeZone: deps.timeZone(),
-    });
-    if (!session) return;
-
-    void deps.sessions.add(session).catch(() => {});
+    // Resolved at completion time (the id and zone are captured now), recorded when the read returns.
+    const id = deps.newId();
+    const timeZone = deps.timeZone();
+    void deps
+      .getSelectedTaskId()
+      .catch(() => null)
+      .then((taskId) => {
+        const session = sessionFromCompletion(event, { id, taskId, timeZone });
+        return session ? deps.sessions.add(session) : undefined;
+      })
+      .catch(() => {});
 
     if (!event.restored) {
       if (deps.getSettings().notifications.browser) guard(() => deps.effects.notify());

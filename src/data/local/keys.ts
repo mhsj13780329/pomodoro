@@ -1,6 +1,7 @@
 export const KEYS = {
   schemaVersion: 'pomodoro.schemaVersion',
   settings: 'pomodoro.settings',
+  tasks: 'pomodoro.tasks',
 } as const;
 
 /** Completed work sessions, one key per Gregorian local month (`YYYY-MM`). */

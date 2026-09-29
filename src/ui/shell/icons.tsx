@@ -87,3 +87,52 @@ export function SkipIcon({ className }: { className?: string }) {
     </Icon>
   );
 }
+
+// Points toward the inline end (right in LTR); callers mirror it in RTL.
+export function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <Icon className={className}>
+      <path d="M9 5l7 7-7 7" />
+    </Icon>
+  );
+}
+
+export function EditIcon() {
+  return (
+    <Icon>
+      <path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4" />
+    </Icon>
+  );
+}
+
+export function TrashIcon() {
+  return (
+    <Icon>
+      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+    </Icon>
+  );
+}
+
+export function CheckIcon() {
+  return (
+    <Icon>
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </Icon>
+  );
+}
+
+export function CloseIcon() {
+  return (
+    <Icon>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </Icon>
+  );
+}
+
+export function GripIcon() {
+  return (
+    <Icon>
+      <path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01" strokeWidth="3" />
+    </Icon>
+  );
+}
