@@ -265,3 +265,13 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Focus on open:** focus now moves to the close button when the drawer opens (previously it fell to `body`), and returns to the edge tab on close.
 - **Touch targets:** below `md` the edge tab is 44 px wide and the drag handle 44 px wide; the edge tab stays 32 px on desktop, where it is a pointer target.
 - **Doc drift:** MILESTONES M7 ("collapsible panel", "arrow/handle") and M8 ("mobile drawer") describe two components, but both are now one drawer.
+
+## M9 notes (calendar domain)
+
+- **Library version:** `jalaali-js` 2.0.1 (exact pin). It ships its own TypeScript types and ESM/CJS builds, so `@types/jalaali-js` is not needed and was not added. No other dependency was added.
+- **Files:** `domain/calendar/{gregorian,jalali,format}.ts` next to `localDate.ts`. Only `jalali.ts` imports `jalaali-js`; the existing ESLint boundary already covers it.
+- **Dates are strings:** all arithmetic (`addDays`, `daysBetween`, `dayOfWeek`, `startOfWeek`, month boundaries) works on `YYYY-MM-DD` strings through UTC date parts, so DST and the machine time zone never affect it. Only `localDateOf` uses a time zone.
+- **Types reused:** `CalendarSystem` comes from `domain/settings`; `WeekStart` (`'saturday' | 'monday'`) is new, with `weekStartFor(calendar)` returning the documented default. The week start is a parameter, so a later setting can override it.
+- **Names:** month and weekday names use `Intl` with `timeZone: 'UTC'` on a date we compute ourselves (Jalali month names from a reference 1400 date converted by `jalaali-js`), never a hand-written table. Digits are left to the `i18n` formatters.
+- **Intl cross-check result (D3 risk):** `jalaali-js` and ICU's Persian calendar agree on every day from 1300 to 1500 AP, so the feared leap-year disagreement did not appear in that range. `jalaali-js` stays the source of truth for arithmetic. The test fails if that ever changes.
+- **Tooling note:** `node_modules` is linked to the repo-local store `.pnpm-store/v10`, so `pnpm add` needed `--store-dir .pnpm-store/v10`.
