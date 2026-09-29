@@ -158,3 +158,13 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **ESLint 9.39.4, not 10.x:** `eslint-plugin-react` (pulled in by `eslint-config-next`) crashes on ESLint 10 (`context.getFilename is not a function`). Pinned to ESLint 9. Revisit when the plugin supports ESLint 10.
 - **Test files are excluded from `tsconfig.domain.json`:** the project has `types: []` and no DOM, so `vitest` imports would not resolve. Tests are type-checked by `tsconfig.json`. Domain source files remain checked without DOM or Node types.
 - **`agentRules: false` in `next.config.ts`:** `next dev` otherwise appends its own block to `AGENTS.md` on every run.
+
+## M1 notes
+
+- **Hardcoded `lang="fa" dir="rtl"`:** the locale cookie belongs to M3. Until then the layout uses the documented default (Persian, RTL).
+- **Theme is in memory until M2:** the UI may not touch storage (lint-enforced) and the settings repository does not exist yet. An inline script in `<head>` sets the `dark` class from `prefers-color-scheme` before first paint. `ThemeToggle` flips the class, and the choice is lost on reload. M2 wires persistence (and the cookie mirror for no-flash).
+- **i18n seed (`src/i18n/messages.ts`):** lint forbids JSX text literals, so M1 needs strings before M3. It contains typed `en`/`fa` dictionaries and a `t(key)` that always returns Persian. M3 replaces `t` with locale-aware lookup and keeps the key names. A small key-parity test exists already.
+- **Font:** Vazirmatn via `next/font/google`; the build succeeded, so no local file was needed.
+- **Icons:** hand-rolled inline SVG (`currentColor`), no icon dependency.
+- **Tokens:** CSS variables per theme (`:root`, `.dark`) mapped into Tailwind with `@theme inline`; another theme is another selector. Dark variant is class-based via `@custom-variant`.
+- **Navigation:** sidebar from `md` up, fixed bottom tab bar below. The `md` breakpoint (768px) is the switch. Only nav and theme toggle live in the shell; the toggle is only in the sidebar for now (mobile has no toggle until M17/M16 settings).

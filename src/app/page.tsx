@@ -1,3 +1,5 @@
+import { PagePlaceholder } from '@/ui/shell/PagePlaceholder';
+
 export default function HomePage() {
-  return <main className="min-h-screen" />;
+  return <PagePlaceholder title="page.timer.title" />;
 }
