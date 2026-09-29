@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { useT } from '@/application/providers/LocaleProvider';
 import type { Task } from '@/domain/tasks';
 import { CheckIcon, EditIcon, GripIcon, TrashIcon } from '../shell/icons';
@@ -142,15 +143,19 @@ export function TaskItem({ task, selected, onSelect, onToggle, onEdit, onDelete 
           </>
         )}
       </div>
-      {drag.ghost ? (
-        <div
-          aria-hidden="true"
-          style={{ left: drag.ghost.x, top: drag.ghost.y }}
-          className="pointer-events-none fixed z-50 max-w-60 -translate-x-1/2 -translate-y-1/2 truncate rounded-control border border-accent bg-surface px-3 py-2 text-body text-fg shadow-lg"
-        >
-          {task.title}
-        </div>
-      ) : null}
+      {drag.ghost
+        ? // Portal: the drawer is transformed, which would make it the containing block of `fixed`.
+          createPortal(
+            <div
+              aria-hidden="true"
+              style={{ left: drag.ghost.x, top: drag.ghost.y }}
+              className="pointer-events-none fixed z-50 max-w-60 -translate-x-1/2 -translate-y-1/2 truncate rounded-control border border-accent bg-surface px-3 py-2 text-body text-fg shadow-lg"
+            >
+              {task.title}
+            </div>,
+            document.body,
+          )
+        : null}
       {invalid ? (
         <p id={`${task.id}-error`} role="alert" className="ps-12 text-caption text-fg">
           {t('tasks.error.titleRequired')}
