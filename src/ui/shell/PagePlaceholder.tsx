@@ -1,10 +1,20 @@
-import { t, type MessageKey } from '@/i18n/messages';
+'use client';
 
-export function PagePlaceholder({ title }: { title: MessageKey }) {
+import { useT } from '@/application/providers/LocaleProvider';
+import type { MessageKey } from '@/i18n';
+import { LanguageSwitch } from './LanguageSwitch';
+
+export function PagePlaceholder({ title, withLanguageSwitch = false }: { title: MessageKey; withLanguageSwitch?: boolean }) {
+  const { t } = useT();
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-2 p-6 md:p-10">
       <h1 className="text-title font-bold">{t(title)}</h1>
       <p className="text-muted">{t('page.placeholder')}</p>
+      {withLanguageSwitch ? (
+        <div className="mt-4 max-w-xs md:hidden">
+          <LanguageSwitch />
+        </div>
+      ) : null}
     </main>
   );
 }

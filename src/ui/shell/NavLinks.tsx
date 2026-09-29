@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { t, type MessageKey } from '@/i18n/messages';
+import { useT } from '@/application/providers/LocaleProvider';
+import type { MessageKey } from '@/i18n';
 import { SettingsIcon, StatsIcon, TimerIcon } from './icons';
 
 const items: { href: string; label: MessageKey; icon: () => React.JSX.Element }[] = [
@@ -13,6 +14,7 @@ const items: { href: string; label: MessageKey; icon: () => React.JSX.Element }[
 
 export function NavLinks({ orientation }: { orientation: 'sidebar' | 'bar' }) {
   const pathname = usePathname();
+  const { t } = useT();
   const isBar = orientation === 'bar';
 
   return (

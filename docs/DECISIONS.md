@@ -180,3 +180,14 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Storage fallback:** if storage is unavailable, stores fall back to memory and expose `persistent: false`. The non-blocking notice UI is deferred to M17.
 - **Storage lint rule** (`no-restricted-globals` and properties) now also covers `src/platform`. Verified once with a temporary bad import in `src/ui`, then removed.
 - **Deviation in Provider timing:** settings load in an effect after hydration (SSR must not read storage), so other settings render defaults for one frame. Theme is unaffected thanks to the cookie.
+
+## M3 notes
+
+- **Files:** `src/i18n` is now `en.ts` (shape), `fa.ts` (`satisfies`), `locale.ts`, `translate.ts`, `format.ts`, `index.ts`. The M1 `messages.ts` seed is gone; key names are unchanged. `t()` is no longer a global: components get it from `useT()` (`application/providers/LocaleProvider`).
+- **Language source of truth:** the `language` setting. The `pomodoro-locale` cookie is only a mirror so the server can render `<html lang dir>`. Until settings load, the server-provided locale is used; then the setting wins.
+- **No numerals cookie:** the shell has no numbers yet. The timer (M5) will show digits and must avoid a one-frame numeral flash (for example by mirroring numerals into a cookie too).
+- **Independence:** switching language does not change numerals or calendar. Only `defaultSettings(language)` derives them, on first run. A first-time visitor who switches to English keeps Persian numerals until the numerals control exists (M16).
+- **Client components:** `AppShell` and `PagePlaceholder` became client components to use `useT()`. They still render server-side with the right language.
+- **Temporary language switch:** `LanguageSwitch` is in the desktop sidebar and on the `/settings` placeholder (mobile only, since mobile has no sidebar). Replaced in M16.
+- **No plurals or missing-param handling beyond `{name}` interpolation:** no message needs them yet. No message uses a placeholder yet, so `translate` interpolation is untested until one does.
+- **Unknown locale cookie values** fall back to Persian.

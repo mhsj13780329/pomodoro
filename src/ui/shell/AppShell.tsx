@@ -1,9 +1,13 @@
+'use client';
+
 import type { ReactNode } from 'react';
-import { t } from '@/i18n/messages';
+import { useT } from '@/application/providers/LocaleProvider';
+import { LanguageSwitch } from './LanguageSwitch';
 import { NavLinks } from './NavLinks';
 import { ThemeToggle } from './ThemeToggle';
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const { t } = useT();
   return (
     <div className="min-h-dvh md:flex">
       <aside className="hidden w-60 shrink-0 flex-col gap-6 border-e border-border bg-surface p-4 md:sticky md:top-0 md:flex md:h-dvh">
@@ -11,7 +15,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <nav aria-label={t('nav.label')}>
           <NavLinks orientation="sidebar" />
         </nav>
-        <div className="mt-auto">
+        <div className="mt-auto flex flex-col gap-2">
+          <LanguageSwitch />
           <ThemeToggle />
         </div>
       </aside>

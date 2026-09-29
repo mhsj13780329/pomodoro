@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 import { useSettings } from '@/application/providers/SettingsProvider';
-import { t } from '@/i18n/messages';
+import { useT } from '@/application/providers/LocaleProvider';
 import { MoonIcon } from './icons';
 
 // The `dark` class on <html> is the source of truth (set before paint by the layout script).
@@ -16,6 +16,7 @@ const getServerSnapshot = () => false;
 
 export function ThemeToggle() {
   const { updateSettings } = useSettings();
+  const { t } = useT();
   const dark = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   return (
