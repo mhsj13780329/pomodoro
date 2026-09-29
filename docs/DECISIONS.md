@@ -258,3 +258,10 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Drop zone:** a dashed zone above the timer on desktop ("Drag your task here" when empty) and at the top of the mobile drawer under "Currently selected task". Once filled it shows the task with a "Selected" label and a clear button (added so a selection can be removed; the first M7 UI could only change it).
 - **Mobile timer view:** when a task is selected, a read-only chip above the timer shows it (no placeholder there), so the selection is visible with the drawer closed.
 - **Not verified in a browser:** touch dragging and the RTL tab animation were checked only by typecheck, lint and build.
+
+## M8 verification notes (mobile task drawer)
+
+- **M8 is satisfied by the M7 edge drawer.** No separate mobile component was built. Below `md` the drawer is a modal side drawer (not a bottom sheet; the milestone allows either), with a backdrop, a Tab trap and Esc to close. The selected task shows in a read-only chip above the timer. Supersedes the "stacked under the timer until the M8 drawer" line in the M7 notes.
+- **Focus on open:** focus now moves to the close button when the drawer opens (previously it fell to `body`), and returns to the edge tab on close.
+- **Touch targets:** below `md` the edge tab is 44 px wide and the drag handle 44 px wide; the edge tab stays 32 px on desktop, where it is a pointer target.
+- **Doc drift:** MILESTONES M7 ("collapsible panel", "arrow/handle") and M8 ("mobile drawer") describe two components, but both are now one drawer.

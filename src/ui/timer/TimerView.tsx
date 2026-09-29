@@ -20,10 +20,10 @@ export function TimerView() {
       <main className="mx-auto flex min-h-[70dvh] w-full min-w-0 max-w-3xl flex-1 flex-col items-center justify-center gap-8 p-6 md:min-h-dvh md:p-10">
         <h1 className="sr-only">{t('page.timer.title')}</h1>
         <div className="hidden w-full max-w-md md:block">
-          <SelectedTaskZone />
+          <SelectedTaskZone centered />
         </div>
         <div className="w-full max-w-md md:hidden">
-          <SelectedTaskZone readOnly />
+          <SelectedTaskZone readOnly centered />
         </div>
         <SessionIndicator snapshot={timer.snapshot} restoredPaused={timer.restoredPaused} />
         <DigitalTimer snapshot={timer.snapshot} />

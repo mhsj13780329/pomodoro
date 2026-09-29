@@ -112,7 +112,7 @@ export function TaskItem({ task, selected, onSelect, onToggle, onEdit, onDelete 
                 aria-hidden="true"
                 title={t('tasks.drag.handle', title)}
                 onPointerDown={drag.onPointerDown}
-                className="inline-flex h-11 w-6 shrink-0 cursor-grab touch-none items-center justify-center text-muted active:cursor-grabbing"
+                className="inline-flex h-11 w-11 shrink-0 cursor-grab touch-none items-center justify-center text-muted active:cursor-grabbing"
               >
                 <GripIcon />
               </span>
