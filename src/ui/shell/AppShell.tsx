@@ -5,6 +5,7 @@ import { useT } from '@/application/providers/LocaleProvider';
 import { LanguageSwitch } from './LanguageSwitch';
 import { NavLinks } from './NavLinks';
 import { ThemeToggle } from './ThemeToggle';
+import { ToastHost } from './ToastHost';
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useT();
@@ -29,6 +30,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         <NavLinks orientation="bar" />
       </nav>
+      <ToastHost />
     </div>
   );
 }

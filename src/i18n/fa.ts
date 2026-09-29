@@ -31,4 +31,8 @@ export const fa = {
   'timer.reset.confirm': 'بازنشانی',
   'timer.reset.cancel': 'انصراف',
   'timer.remaining': '{time} مانده',
+  'toast.workComplete': 'یک پومودورو کامل شد. آفرین!',
+  'toast.dismiss': 'بستن',
+  'notification.workComplete.title': 'پومودورو کامل شد',
+  'notification.workComplete.body': 'آفرین. وقت استراحت است.',
 } satisfies Messages;

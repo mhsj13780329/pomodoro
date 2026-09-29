@@ -30,6 +30,10 @@ export const en = {
   'timer.reset.confirm': 'Reset',
   'timer.reset.cancel': 'Cancel',
   'timer.remaining': '{time} remaining',
+  'toast.workComplete': 'Pomodoro complete. Nice work!',
+  'toast.dismiss': 'Dismiss',
+  'notification.workComplete.title': 'Pomodoro complete',
+  'notification.workComplete.body': 'Nice work. Time for a break.',
 } as const;
 
 export type MessageKey = keyof typeof en;

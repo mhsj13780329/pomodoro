@@ -1,0 +1,1 @@
+export { localDateOf } from './localDate';
