@@ -314,3 +314,13 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Trend:** shown as text ("Up 1 h 5 min from last week"), no arrow icon, so it is not color- or glyph-dependent.
 - **Empty state:** the page shows the PRD §24 text when there are no sessions at all. This resolves the M11 note that the "ever had a session" check belongs to M12. Today's card keeps its own today-scoped empty state.
 - **Doc drift:** MILESTONES M12 mentions "task completion" as a stat. Only the total (`completed of total`) is shown, as in M10; per-period task completion was not built.
+
+## M13 notes (calendar and numerals in the UI)
+
+- **Temporary controls on `/settings`.** Numerals, primary calendar and the secondary-calendar toggle live on the settings placeholder at all widths, next to the existing mobile-only `LanguageSwitch`. M16 replaces this with the full settings UI. Switching language still does not change numerals or calendar.
+- **Shared primitive:** `SegmentedControl` (`ui/primitives`) is the exclusive-choice control. `LanguageSwitch` now uses it, with no behaviour change.
+- **Secondary calendar:** the other calendar of the pair (Jalali if primary is Gregorian, and the reverse). Date labels (`useDateLabel.full`) append it in parentheses. Heatmap cells show the secondary day-of-month in the top logical corner from the `sm` breakpoint up; cells are too small on mobile, so the number is hidden there. The cell `aria-label` still includes the secondary date via `full()`.
+- **Week start still follows the primary calendar** (Saturday for Jalali, Monday for Gregorian). Totals, streaks and activity counts do not depend on the calendar. Switching the calendar can change which seven days "this week" covers, because the week start changes. The M13 regression ("stats values unchanged") is tested with `weekStart` held fixed.
+- **Numerals:** already applied everywhere through `formatNumber` / `formatClock` / `formatDuration`. The new `/settings` control is the missing piece from the M3 note. Tests cover `fa`+Latin and `en`+Persian for clock and duration.
+- **No new dependency.**
+

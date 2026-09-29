@@ -28,6 +28,12 @@ describe('formatNumber', () => {
     expect(f('en', 'latin')).toBe('1,234.5');
     expect(f('fa', 'latin', 25)).toBe('25');
   });
+  it('language and numerals stay independent for clock and duration', () => {
+    expect(formatClock(90_000, { locale: 'fa', numerals: 'latin' })).toBe('01:30');
+    expect(formatClock(90_000, { locale: 'en', numerals: 'persian' })).toBe('۰۱:۳۰');
+    expect(formatDuration(25 * 60_000, { locale: 'fa', numerals: 'latin' })).toBe('25 دقیقه');
+    expect(formatDuration(25 * 60_000, { locale: 'en', numerals: 'persian' })).toBe('۲۵ min');
+  });
 });
 
 describe('formatClock', () => {

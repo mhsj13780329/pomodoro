@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { weekStartFor } from '../calendar';
 import { localDateOf } from '../calendar/localDate';
 import type { PomodoroSession } from '../sessions/types';
 import type { Task } from '../tasks/types';
 import {
+  activityGrid,
   currentStreak,
   dailySummary,
   goalProgress,
@@ -247,5 +249,25 @@ describe('longTermSummary', () => {
     const a = longTermSummary(sessions, [], '2026-05-11', 'saturday');
     const b = longTermSummary(sessions, [], '2026-05-11', 'monday');
     expect({ ...a, trend: null }).toEqual({ ...b, trend: null });
+  });
+
+  it('weekly, long-term and activity values are identical for any calendar when weekStart is the same', () => {
+    const sessions = [work('2026-05-09'), work('2026-05-10'), work('2026-05-11')];
+    const today = '2026-05-11';
+    const jalaliDefault = weekStartFor('jalali');
+    const gregorianDefault = weekStartFor('gregorian');
+    expect(jalaliDefault).not.toBe(gregorianDefault);
+
+    const held: typeof gregorianDefault = gregorianDefault;
+    expect(weeklySummary(sessions, today, held)).toEqual(weeklySummary(sessions, today, gregorianDefault));
+    expect(longTermSummary(sessions, [], today, held)).toEqual(longTermSummary(sessions, [], today, gregorianDefault));
+    expect(activityGrid(sessions, today, 4, held)).toEqual(activityGrid(sessions, today, 4, gregorianDefault));
+
+    expect(longTermSummary(sessions, [], today, jalaliDefault).totalPomodoros).toBe(
+      longTermSummary(sessions, [], today, gregorianDefault).totalPomodoros,
+    );
+    expect(longTermSummary(sessions, [], today, jalaliDefault).currentStreak).toBe(
+      longTermSummary(sessions, [], today, gregorianDefault).currentStreak,
+    );
   });
 });

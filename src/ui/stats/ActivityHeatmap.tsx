@@ -31,22 +31,30 @@ export function ActivityHeatmap({ grid }: { grid: ActivityCell[][] }) {
       <div role="group" aria-label={t('stats.activity.groupLabel')} className="mt-3 grid auto-cols-fr grid-flow-col gap-1">
         {grid.map((week, w) => (
           <div key={week[0].date} className={`${w < hiddenOnMobile ? 'hidden sm:grid' : 'grid'} grid-rows-7 gap-1`}>
-            {week.map((cell) => (
-              <div
-                key={cell.date}
-                role="img"
-                aria-label={
-                  cell.isFuture
-                    ? t('stats.activity.cellFuture', { date: label.full(cell.date) })
-                    : t('stats.activity.cell', { date: label.full(cell.date), count: formatNumber(cell.pomodoros) })
-                }
-                className={`flex aspect-square min-w-0 items-center justify-center overflow-hidden rounded-[4px] text-[0.625rem] font-medium leading-none ${
-                  cell.isFuture ? 'border border-dashed border-border' : LEVEL_CLASS[cell.level]
-                }`}
-              >
-                {cell.pomodoros > 0 ? formatNumber(cell.pomodoros) : null}
-              </div>
-            ))}
+            {week.map((cell) => {
+              const secondaryDay = label.secondaryDay(cell.date);
+              return (
+                <div
+                  key={cell.date}
+                  role="img"
+                  aria-label={
+                    cell.isFuture
+                      ? t('stats.activity.cellFuture', { date: label.full(cell.date) })
+                      : t('stats.activity.cell', { date: label.full(cell.date), count: formatNumber(cell.pomodoros) })
+                  }
+                  className={`relative flex aspect-square min-w-0 items-center justify-center overflow-hidden rounded-[4px] text-[0.625rem] font-medium leading-none ${
+                    cell.isFuture ? 'border border-dashed border-border' : LEVEL_CLASS[cell.level]
+                  }`}
+                >
+                  {secondaryDay ? (
+                    <span aria-hidden="true" className="absolute top-0 start-0.5 hidden text-[0.5rem] font-normal opacity-70 sm:inline">
+                      {secondaryDay}
+                    </span>
+                  ) : null}
+                  {cell.pomodoros > 0 ? formatNumber(cell.pomodoros) : null}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
