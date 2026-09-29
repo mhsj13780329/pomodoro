@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo } from 'reac
 import type { ReactNode } from 'react';
 import { writeLocaleCookie } from '@/data/local/localeCookie';
 import { defaultSettings } from '@/domain/settings';
-import { dirOf, formatNumber, translate } from '@/i18n';
+import { dirOf, formatClock, formatNumber, translate } from '@/i18n';
 import type { Direction, Locale, MessageKey, Params } from '@/i18n';
 import { useSettings } from './SettingsProvider';
 
@@ -13,6 +13,7 @@ interface LocaleContextValue {
   dir: Direction;
   t: (key: MessageKey, params?: Params) => string;
   formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
+  formatClock: (ms: number) => string;
 }
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -35,7 +36,11 @@ export function LocaleProvider({ initialLocale, children }: { initialLocale: Loc
     (value: number, options?: Intl.NumberFormatOptions) => formatNumber(value, { locale, numerals }, options),
     [locale, numerals],
   );
-  const value = useMemo(() => ({ locale, dir, t, formatNumber: format }), [locale, dir, t, format]);
+  const clock = useCallback((ms: number) => formatClock(ms, { locale, numerals }), [locale, numerals]);
+  const value = useMemo(
+    () => ({ locale, dir, t, formatNumber: format, formatClock: clock }),
+    [locale, dir, t, format, clock],
+  );
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 

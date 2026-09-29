@@ -1,5 +1,5 @@
-import { PagePlaceholder } from '@/ui/shell/PagePlaceholder';
+import { TimerView } from '@/ui/timer/TimerView';
 
 export default function HomePage() {
-  return <PagePlaceholder title="page.timer.title" />;
+  return <TimerView />;
 }

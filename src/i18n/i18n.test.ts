@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dirOf, en, fa, formatNumber, parseLocale, translate } from '@/i18n';
+import { dirOf, en, fa, formatClock, formatNumber, parseLocale, translate } from '@/i18n';
 
 describe('dictionaries', () => {
   it('fa has exactly the keys of en', () => {
@@ -27,6 +27,18 @@ describe('formatNumber', () => {
   it('Latin numerals in both languages', () => {
     expect(f('en', 'latin')).toBe('1,234.5');
     expect(f('fa', 'latin', 25)).toBe('25');
+  });
+});
+
+describe('formatClock', () => {
+  it('formats mm:ss in both numeral systems', () => {
+    expect(formatClock(25 * 60_000, { locale: 'en', numerals: 'latin' })).toBe('25:00');
+    expect(formatClock(65_000, { locale: 'fa', numerals: 'persian' })).toBe('۰۱:۰۵');
+  });
+  it('handles zero and more than 99 minutes, rounding partial seconds up', () => {
+    expect(formatClock(0, { locale: 'en', numerals: 'latin' })).toBe('00:00');
+    expect(formatClock(180 * 60_000, { locale: 'en', numerals: 'latin' })).toBe('180:00');
+    expect(formatClock(1, { locale: 'en', numerals: 'latin' })).toBe('00:01');
   });
 });
 

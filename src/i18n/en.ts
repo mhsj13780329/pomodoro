@@ -13,6 +13,23 @@ export const en = {
   'page.statistics.title': 'Statistics',
   'page.settings.title': 'Settings',
   'page.placeholder': 'This section is coming soon.',
+  'timer.session.work': 'Focus',
+  'timer.session.shortBreak': 'Short break',
+  'timer.session.longBreak': 'Long break',
+  'timer.status.idle': 'Ready',
+  'timer.status.running': 'Running',
+  'timer.status.paused': 'Paused',
+  'timer.status.restored': 'Paused after reload. Press Resume to continue.',
+  'timer.controls.label': 'Timer controls',
+  'timer.controls.start': 'Start',
+  'timer.controls.pause': 'Pause',
+  'timer.controls.resume': 'Resume',
+  'timer.controls.reset': 'Reset',
+  'timer.controls.skip': 'Skip',
+  'timer.reset.message': 'Are you sure? Your current session won’t count.',
+  'timer.reset.confirm': 'Reset',
+  'timer.reset.cancel': 'Cancel',
+  'timer.remaining': '{time} remaining',
 } as const;
 
 export type MessageKey = keyof typeof en;

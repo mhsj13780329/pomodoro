@@ -7,6 +7,15 @@ export interface NumberFormatContext {
   numerals: NumeralSystem;
 }
 
+/** `mm:ss` (minutes may exceed 99) in the chosen numeral system. */
+export function formatClock(ms: number, ctx: NumberFormatContext): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const two = { minimumIntegerDigits: 2, useGrouping: false };
+  const minutes = formatNumber(Math.floor(total / 60), ctx, two);
+  const seconds = formatNumber(total % 60, ctx, two);
+  return `${minutes}:${seconds}`;
+}
+
 /** Numerals are chosen independently of the language (PRD section 12). */
 export function formatNumber(
   value: number,

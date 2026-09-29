@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 
-function Icon({ children }: { children: ReactNode }) {
+function Icon({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <svg
+      className={className}
       aria-hidden="true"
       focusable="false"
       viewBox="0 0 24 24"
@@ -50,6 +51,39 @@ export function MoonIcon() {
   return (
     <Icon>
       <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
+    </Icon>
+  );
+}
+
+export function PlayIcon({ className }: { className?: string }) {
+  return (
+    <Icon className={className}>
+      <path d="M7 4.5v15l12-7.5z" />
+    </Icon>
+  );
+}
+
+export function PauseIcon({ className }: { className?: string }) {
+  return (
+    <Icon className={className}>
+      <path d="M8 5v14M16 5v14" />
+    </Icon>
+  );
+}
+
+export function ResetIcon({ className }: { className?: string }) {
+  return (
+    <Icon className={className}>
+      <path d="M4 12a8 8 0 1 0 2.6-5.9M4 4v4h4" />
+    </Icon>
+  );
+}
+
+// Directional: callers mirror it in RTL.
+export function SkipIcon({ className }: { className?: string }) {
+  return (
+    <Icon className={className}>
+      <path d="M5 5v14l10-7zM19 5v14" />
     </Icon>
   );
 }

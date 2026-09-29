@@ -204,3 +204,19 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Restore validates input:** `restoreTimerState` accepts `unknown`. Anything that is not a valid `PersistedTimerState` becomes a fresh idle work timer (M5's "corrupt state" criterion). A paused state with 0 remaining also completes on restore, with `completedAt = savedAt`.
 - **Extras beyond the listed scope:** `timerConfigFromSettings` (minutes to ms), `countWorkSessionsOn` (today's work sessions, so the cycle counter is testable across a day boundary), and `platform/clock.ts` (`systemClock`). `FakeClock` lives in `domain/timer/testing.ts`.
 - **`SessionType`** is defined once in `domain/timer/types.ts` and re-exported from `domain/sessions/types.ts`.
+
+## M5 notes
+
+- **`TimerProvider` is mounted in the root layout**, inside the settings and locale providers, not in the page. If it lived in `/`, navigating to another route and back would rebuild the engine from saved state and turn a running timer into a paused one. ARCHITECTURE section 2 lists providers but does not say this.
+- **The engine is created only after settings have loaded** (they load asynchronously after hydration), because the engine needs the real durations. Until then the timer shows an empty placeholder, which also avoids a numeral or duration flash. Consequence: the timer is not interactive for the first frame or two.
+- **Initial save at boot:** persistence saves once when it attaches, not only on version changes. Otherwise a restore that completed a zero-remaining session would be replayed by the next reload, because the stored state would still say "about to complete".
+- **Cycle counter input** is a `getCompletedWorkToday` prop on `TimerProvider` (default `() => 0`). It is applied at boot and just before a manual Start. An auto-started work session is not re-derived here; M6's event subscriber does that.
+- **"Restored paused" flag** lives in the provider (true when boot restored a running or paused state, cleared on the next Resume, Reset, Skip or Start). The engine knows nothing about it. The UI shows a bordered text label plus a ringed Resume button.
+- **Reset is disabled while idle** (nothing to reset). The confirmation dialog appears only for running or paused sessions. Skip has no confirmation.
+- **Dialog** is a hand-rolled primitive on native `<dialog>` and `showModal()`: focus trap, Esc, and focus return come from the platform. No dependency. A synthetic `.click()` does not focus the trigger, so focus return was only checked by reasoning and the platform behavior, not by a pointer test.
+- **Digit jitter (D6) verified:** in Chromium every Persian (۰-۹) and Latin digit measured the same width under `tabular-nums` with Vazirmatn (59.72 px and 50.51 px at the 5.5rem size). No per-digit boxes needed. Not checked in Safari or Firefox.
+- **Clock text is always `dir="ltr"`** so `mm:ss` is not reordered in RTL. Digits still follow the numeral setting.
+- **`formatClock`** was added to `i18n/format.ts` (rounds partial seconds up, minutes are not capped at 99).
+- **Session-storage keys** live in `src/data/session/keys.ts`, separate from the shared `data/local` keys.
+- **`useTimerDriver` uses `systemClock`** for the one-shot wake-up timeout. Hidden-tab behavior was covered by engine tests (multi-hour gap); the browser was not backgrounded for minutes in manual testing.
+- **Not built (later milestones):** toast, sound, notification, session recording (M6); task selection UI (M7). The selected-task-ID methods exist on the repository and are tested, but nothing calls them yet.
