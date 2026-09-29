@@ -126,7 +126,7 @@ const config = defineConfig([
     },
   },
   {
-    files: ['src/app/**/*.{ts,tsx}', 'src/application/**/*.{ts,tsx}'],
+    files: ['src/app/**/*.{ts,tsx}', 'src/application/**/*.{ts,tsx}', 'src/platform/**/*.{ts,tsx}'],
     rules: {
       ...storageGlobals,
       'no-restricted-properties': ['error', ...storageProperties],

@@ -168,3 +168,15 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Icons:** hand-rolled inline SVG (`currentColor`), no icon dependency.
 - **Tokens:** CSS variables per theme (`:root`, `.dark`) mapped into Tailwind with `@theme inline`; another theme is another selector. Dark variant is class-based via `@custom-variant`.
 - **Navigation:** sidebar from `md` up, fixed bottom tab bar below. The `md` breakpoint (768px) is the switch. Only nav and theme toggle live in the shell; the toggle is only in the sidebar for now (mobile has no toggle until M17/M16 settings).
+
+## M2 notes
+
+- **No envelope wrapper:** D4's layout is used (separate keys plus a `pomodoro.schemaVersion` key). "Schema envelope" in MILESTONES means that version key. Migrations run in `createSettingsRepository` on boot; data from a newer version is left untouched.
+- **Invented v0 fixture:** no released v0 exists. v0 is defined as a legacy flat settings blob (`{ theme, language, workMinutes, ..., autoStart }`); v1 is the nested `UserSettings` shape. This only exercises the migration runner.
+- **Theme is `system | light | dark`** (default `system`). The toggle sets an explicit light or dark. The choice is mirrored to the `pomodoro-theme` cookie so the server renders the `dark` class on first paint. Only first-time visitors or `system` use the inline `matchMedia` script. A user with stored settings but no cookie (before this change) sees one possible flash.
+- **Layout is now dynamic** because it reads the cookie (M3 needs this for the locale cookie anyway).
+- **Repository ports for tasks, sessions, timer state and goal** are minimal, and their entity types are minimal type-only files (`domain/tasks`, `sessions`, `goals`, `timer/persisted.ts`). The milestone that implements each one refines them. M4 should move `PersistedTimerState` next to the engine types.
+- **Settings durations are stored in minutes** (user units); the timer converts to ms. Normalization clamps: work 1-180, short break 1-60, long break 1-120, sessions before long break 1-12.
+- **Storage fallback:** if storage is unavailable, stores fall back to memory and expose `persistent: false`. The non-blocking notice UI is deferred to M17.
+- **Storage lint rule** (`no-restricted-globals` and properties) now also covers `src/platform`. Verified once with a temporary bad import in `src/ui`, then removed.
+- **Deviation in Provider timing:** settings load in an effect after hydration (SSR must not read storage), so other settings render defaults for one frame. Theme is unaffected thanks to the cookie.

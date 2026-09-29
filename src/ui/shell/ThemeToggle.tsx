@@ -1,6 +1,7 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { useSettings } from '@/application/providers/SettingsProvider';
 import { t } from '@/i18n/messages';
 import { MoonIcon } from './icons';
 
@@ -14,13 +15,14 @@ const getSnapshot = () => document.documentElement.classList.contains('dark');
 const getServerSnapshot = () => false;
 
 export function ThemeToggle() {
+  const { updateSettings } = useSettings();
   const dark = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   return (
     <button
       type="button"
       aria-pressed={dark}
-      onClick={() => document.documentElement.classList.toggle('dark')}
+      onClick={() => updateSettings({ theme: dark ? 'light' : 'dark' })}
       className="flex min-h-11 w-full items-center gap-3 rounded-control px-3 py-2 text-body font-medium text-muted transition-colors hover:bg-surface-hover hover:text-fg"
     >
       <MoonIcon />
