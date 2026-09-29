@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useT } from '@/application/providers/LocaleProvider';
 import { useTimer } from '@/application/timer/TimerProvider';
+import { TodayCard } from '../stats/TodayCard';
 import { SelectedTaskZone } from '../tasks/SelectedTaskZone';
 import { TasksDrawer } from '../tasks/TasksDrawer';
 import { DigitalTimer } from './DigitalTimer';
@@ -36,6 +37,7 @@ export function TimerView() {
           onReset={() => setConfirmingReset(true)}
           onSkip={timer.skip}
         />
+        <TodayCard />
         <ResetDialog
           open={confirmingReset}
           onCancel={() => setConfirmingReset(false)}

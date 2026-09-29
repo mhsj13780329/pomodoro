@@ -1,4 +1,5 @@
 import type { Locale } from './locale';
+import { translate } from './translate';
 
 export type NumeralSystem = 'persian' | 'latin';
 
@@ -24,4 +25,12 @@ export function formatNumber(
 ): string {
   const tag = `${locale === 'fa' ? 'fa-IR' : 'en-US'}-u-nu-${numerals === 'persian' ? 'arabext' : 'latn'}`;
   return new Intl.NumberFormat(tag, options).format(value);
+}
+
+/** Focus time: "25 min" below an hour, "1 h 30 min" above. Rounded to whole minutes. */
+export function formatDuration(ms: number, ctx: NumberFormatContext): string {
+  const total = Math.max(0, Math.round(ms / 60_000));
+  const m = formatNumber(total % 60, ctx);
+  if (total < 60) return translate(ctx.locale, 'duration.minutes', { m: formatNumber(total, ctx) });
+  return translate(ctx.locale, 'duration.hoursMinutes', { h: formatNumber(Math.floor(total / 60), ctx), m });
 }

@@ -14,6 +14,7 @@ let selected: string | null = 'task1';
 const flush = () => new Promise<void>((r) => setTimeout(r, 0));
 
 function setup(overrides: Partial<UserSettings> = {}, store = new MemoryStore()) {
+  let recorded = 0;
   const settings: UserSettings = { ...defaultSettings('en'), ...overrides };
   const sessions = createSessionRepository(store);
   const calls: string[] = [];
@@ -23,6 +24,9 @@ function setup(overrides: Partial<UserSettings> = {}, store = new MemoryStore())
     timeZone: () => TZ,
     getSelectedTaskId: async () => selected,
     getSettings: () => settings,
+    onSessionRecorded: () => {
+      recorded += 1;
+    },
     effects: {
       playSound: () => calls.push('sound'),
       notify: () => calls.push('notify'),
@@ -36,7 +40,7 @@ function setup(overrides: Partial<UserSettings> = {}, store = new MemoryStore())
     await flush();
     return sessions.listByLocalDate('2026-03-20');
   };
-  return { engine, clock, calls, today, sessions, handler, config, settings };
+  return { engine, clock, calls, today, sessions, handler, config, settings, recorded: () => recorded };
 }
 
 const allOn = { notifications: { browser: true, sound: true } };
@@ -52,6 +56,22 @@ describe('completion handler', () => {
     expect(list).toHaveLength(1);
     expect(list[0]).toMatchObject({ taskId: 'task1', type: 'work', plannedMs: 25 * 60_000, localDate: '2026-03-20' });
     expect(calls).toEqual(['sound', 'notify', 'toast']);
+  });
+
+  it('notifies once per recorded work session and never for skip, reset or breaks', async () => {
+    const a = setup(allOn);
+    a.engine.start();
+    a.clock.advance(25 * 60_000);
+    a.engine.tick();
+    await a.today();
+    expect(a.recorded()).toBe(1);
+    const b = setup(allOn);
+    b.engine.start();
+    b.engine.skip();
+    b.engine.start();
+    b.engine.reset();
+    await b.today();
+    expect(b.recorded()).toBe(0);
   });
 
   it('records the task selected at completion, or none when it no longer exists', async () => {

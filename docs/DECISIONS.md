@@ -291,3 +291,14 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Calendar independence:** nothing here depends on Jalali or Gregorian. Only `weekStart` is a parameter. Tested.
 - **Deviation from the plan:** `longTermSummary` has no `timeZone` parameter (not needed), and per-week task completion counts were not added (not required by the PRD).
 - **Docs:** ARCHITECTURE section 5 now lists signatures and the average rules.
+
+## M11 notes (daily goal and today card)
+
+- **Goal setting is temporary.** The Settings page is M16, so the goal is edited with a minus/plus stepper on the today card. M16 moves it to `/settings`.
+- **Default goal is 4 Pomodoros** (one cycle before the long break); the PRD gives no default. Range 1 to 24, whole numbers, no "off" state, to keep goals simple. `normalizeGoal` clamps and falls back to the default on garbage.
+- **Storage:** `pomodoro.goal`, one JSON value. `GoalRepository.load()` returns `null` when unset or corrupt (the provider then uses the default). `save` overwrites, which is safe for a single value.
+- **Live update:** `createCompletionHandler` takes an optional `onSessionRecorded`, called after the session is saved. `TodayProvider` (`application/stats`) re-reads today's sessions on that callback, on task list changes, and when the tab becomes visible (which also covers midnight rollover and sessions from other tabs). Today's numbers are derived, never stored.
+- **Empty state is today-scoped:** the PRD §24 text shows when today has no Pomodoros and no completed tasks. An "ever had a session" check needs a full scan and belongs to M12's statistics page.
+- **Focus time format:** `formatDuration` in `i18n` ("25 min", "1 h 30 min"), rounded to whole minutes, numerals per setting.
+- **Provider order:** Settings, Locale, Toast, Tasks, Goal, Today, Timer.
+- **Docs note:** `TodayProvider` lives in `application/stats`; `GoalProvider` in `application/providers` as ARCHITECTURE lists.

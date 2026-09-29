@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dirOf, en, fa, formatClock, formatNumber, parseLocale, translate } from '@/i18n';
+import { dirOf, en, fa, formatClock, formatDuration, formatNumber, parseLocale, translate } from '@/i18n';
 
 describe('dictionaries', () => {
   it('fa has exactly the keys of en', () => {
@@ -39,6 +39,16 @@ describe('formatClock', () => {
     expect(formatClock(0, { locale: 'en', numerals: 'latin' })).toBe('00:00');
     expect(formatClock(180 * 60_000, { locale: 'en', numerals: 'latin' })).toBe('180:00');
     expect(formatClock(1, { locale: 'en', numerals: 'latin' })).toBe('00:01');
+  });
+});
+
+describe('formatDuration', () => {
+  it('minutes below an hour, hours and minutes above, in both numeral systems', () => {
+    expect(formatDuration(0, { locale: 'en', numerals: 'latin' })).toBe('0 min');
+    expect(formatDuration(50 * 60_000, { locale: 'en', numerals: 'latin' })).toBe('50 min');
+    expect(formatDuration(90 * 60_000, { locale: 'en', numerals: 'latin' })).toBe('1 h 30 min');
+    expect(formatDuration(90 * 60_000, { locale: 'fa', numerals: 'persian' })).toBe('۱ ساعت و ۳۰ دقیقه');
+    expect(formatDuration(25 * 60_000, { locale: 'en', numerals: 'persian' })).toBe('۲۵ min');
   });
 });
 

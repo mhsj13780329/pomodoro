@@ -20,6 +20,7 @@ import { localTimeZone } from '@/platform/timeZone';
 import { useT } from '@/application/providers/LocaleProvider';
 import { useSettings } from '@/application/providers/SettingsProvider';
 import { useTasks } from '@/application/providers/TasksProvider';
+import { useToday } from '@/application/stats/TodayProvider';
 import { useToast } from '@/application/providers/ToastProvider';
 import { createCompletionHandler } from './completionHandler';
 import { applyDevSeconds, parseDevSeconds } from './devOverrides';
@@ -52,6 +53,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   const { t } = useT();
   const { showToast } = useToast();
   const { resolveSelectedTaskId } = useTasks();
+  const { refresh: refreshToday } = useToday();
   const [engine, setEngine] = useState<TimerEngine | null>(null);
   const [persistence, setPersistence] = useState<TimerPersistence | null>(null);
   const [restoredPaused, setRestoredPaused] = useState(false);
@@ -61,6 +63,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   const toastRef = useRef(showToast);
   const updateRef = useRef(updateSettings);
   const resolveTaskRef = useRef(resolveSelectedTaskId);
+  const refreshTodayRef = useRef(refreshToday);
   const devSecondsRef = useRef<number | null>(null);
   const sessionsRef = useRef<SessionRepository | null>(null);
   useEffect(() => {
@@ -69,6 +72,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
     toastRef.current = showToast;
     updateRef.current = updateSettings;
     resolveTaskRef.current = resolveSelectedTaskId;
+    refreshTodayRef.current = refreshToday;
   });
 
   const configFor = useCallback(
@@ -99,6 +103,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
       timeZone: localTimeZone,
       getSelectedTaskId: () => resolveTaskRef.current(),
       getSettings: () => settingsRef.current,
+      onSessionRecorded: () => refreshTodayRef.current(),
       effects: {
         playSound: playCompletionSound,
         notify: () =>

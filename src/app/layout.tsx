@@ -3,8 +3,10 @@ import { cookies } from 'next/headers';
 import { Vazirmatn } from 'next/font/google';
 import { LocaleProvider } from '@/application/providers/LocaleProvider';
 import { SettingsProvider } from '@/application/providers/SettingsProvider';
+import { GoalProvider } from '@/application/providers/GoalProvider';
 import { TasksProvider } from '@/application/providers/TasksProvider';
 import { ToastProvider } from '@/application/providers/ToastProvider';
+import { TodayProvider } from '@/application/stats/TodayProvider';
 import { TimerProvider } from '@/application/timer/TimerProvider';
 import { LOCALE_COOKIE, dirOf, parseLocale } from '@/i18n';
 import { AppShell } from '@/ui/shell/AppShell';
@@ -36,9 +38,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <LocaleProvider initialLocale={locale}>
             <ToastProvider>
               <TasksProvider>
-                <TimerProvider>
-                  <AppShell>{children}</AppShell>
-                </TimerProvider>
+                <GoalProvider>
+                  <TodayProvider>
+                    <TimerProvider>
+                      <AppShell>{children}</AppShell>
+                    </TimerProvider>
+                  </TodayProvider>
+                </GoalProvider>
               </TasksProvider>
             </ToastProvider>
           </LocaleProvider>

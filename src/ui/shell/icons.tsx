@@ -136,3 +136,19 @@ export function GripIcon() {
     </Icon>
   );
 }
+
+export function PlusIcon() {
+  return (
+    <Icon>
+      <path d="M12 5v14M5 12h14" />
+    </Icon>
+  );
+}
+
+export function MinusIcon() {
+  return (
+    <Icon>
+      <path d="M5 12h14" />
+    </Icon>
+  );
+}

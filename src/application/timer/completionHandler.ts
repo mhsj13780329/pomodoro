@@ -19,6 +19,8 @@ export interface CompletionDeps {
   getSelectedTaskId: () => Promise<string | null>;
   getSettings: () => UserSettings;
   effects: CompletionEffects;
+  /** Called after a work session has been saved, so views can refresh. */
+  onSessionRecorded?: () => void;
 }
 
 const guard = (fn: () => void) => {
@@ -52,7 +54,7 @@ export function createCompletionHandler(deps: CompletionDeps): (event: TimerEven
       .catch(() => null)
       .then((taskId) => {
         const session = sessionFromCompletion(event, { id, taskId, timeZone });
-        return session ? deps.sessions.add(session) : undefined;
+        return session ? deps.sessions.add(session).then(() => guard(() => deps.onSessionRecorded?.())) : undefined;
       })
       .catch(() => {});
 

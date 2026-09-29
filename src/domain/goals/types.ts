@@ -1,4 +1,4 @@
-// Minimal type only. The daily goal unit is Pomodoros (docs/DECISIONS.md). Used from M11.
+// The daily goal unit is Pomodoros (docs/DECISIONS.md).
 export interface Goal {
   dailyPomodoros: number;
 }

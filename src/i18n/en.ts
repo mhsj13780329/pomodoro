@@ -58,6 +58,18 @@ export const en = {
   'tasks.selectedHeading': 'Currently selected task',
   'tasks.drag.handle': 'Drag task "{title}"',
   'tasks.panel.close': 'Close tasks',
+  'duration.minutes': '{m} min',
+  'duration.hoursMinutes': '{h} h {m} min',
+  'today.title': 'Today',
+  'today.pomodoros': 'Pomodoros',
+  'today.focusTime': 'Focus time',
+  'today.completedTasks': 'Tasks completed',
+  'today.goal.label': 'Daily goal',
+  'today.goal.progress': '{done} / {goal} Pomodoros',
+  'today.goal.reached': 'Goal reached',
+  'today.goal.increase': 'Increase daily goal',
+  'today.goal.decrease': 'Decrease daily goal',
+  'today.empty': 'Complete your first Pomodoro to start building your productivity history.',
 } as const;
 
 export type MessageKey = keyof typeof en;
