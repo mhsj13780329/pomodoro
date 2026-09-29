@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "types": [],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "paths": {
+      "@/domain/*": ["./src/domain/*"],
+      "@/i18n/*": ["./src/i18n/*"]
+    }
+  },
+  "include": ["src/domain/**/*.ts", "src/i18n/**/*.ts"],
+  "exclude": ["**/*.test.ts"]
+}
