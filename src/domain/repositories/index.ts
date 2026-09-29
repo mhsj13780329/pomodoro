@@ -23,6 +23,8 @@ export interface TaskRepository {
 export interface SessionRepository {
   add(session: PomodoroSession): Promise<void>;
   listByLocalDate(localDate: string): Promise<PomodoroSession[]>;
+  /** Every stored session, for statistics. */
+  listAll(): Promise<PomodoroSession[]>;
 }
 
 export interface TimerStateRepository {

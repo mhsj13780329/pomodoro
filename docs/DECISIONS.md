@@ -302,3 +302,15 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Focus time format:** `formatDuration` in `i18n` ("25 min", "1 h 30 min"), rounded to whole minutes, numerals per setting.
 - **Provider order:** Settings, Locale, Toast, Tasks, Goal, Today, Timer.
 - **Docs note:** `TodayProvider` lives in `application/stats`; `GoalProvider` in `application/providers` as ARCHITECTURE lists.
+
+## M12 notes (statistics page)
+
+- **No dependency, no chart library.** Bars and heatmap are plain HTML/CSS.
+- **Port change:** `KeyValueStore.keys(prefix)` and `SessionRepository.listAll()` were added, because sessions are stored one key per month and the page needs all of them. `listAll` skips corrupt months and unrelated keys.
+- **Page-local data hook:** `useStatsData` (`application/stats`) loads on mount and when the tab becomes visible. It is not a global provider, so the timer path is untouched. Nothing is cached in storage.
+- **Calendar before M13:** labels and the week start already follow `settings.calendar.primary` (`weekStartFor`: Saturday for Jalali, Monday for Gregorian). Totals never depend on it. M13 still owns the toggle UI, the secondary calendar in cells, and the both-direction review.
+- **Heatmap:** the last 12 weeks (`activityGrid`, pure and tested), weeks as columns, oldest first, so it reads in the text direction. Below the `sm` breakpoint the oldest third (4 weeks) is hidden with CSS so it fits without horizontal scroll. Levels use shade plus the Pomodoro count printed in the cell, never color alone. Cells are `role="img"` with a full date label.
+- **Weekly chart:** seven CSS bars with visible counts; a visually hidden table carries the data (Pomodoros and focus time per day) as the text alternative.
+- **Trend:** shown as text ("Up 1 h 5 min from last week"), no arrow icon, so it is not color- or glyph-dependent.
+- **Empty state:** the page shows the PRD §24 text when there are no sessions at all. This resolves the M11 note that the "ever had a session" check belongs to M12. Today's card keeps its own today-scoped empty state.
+- **Doc drift:** MILESTONES M12 mentions "task completion" as a stat. Only the total (`completed of total`) is shown, as in M10; per-period task completion was not built.

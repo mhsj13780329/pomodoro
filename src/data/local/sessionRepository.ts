@@ -41,5 +41,12 @@ export function createSessionRepository(store: KeyValueStore): SessionRepository
     async listByLocalDate(localDate) {
       return readMonth(store, localDate.slice(0, 7)).filter((s) => s.localDate === localDate);
     },
+    async listAll() {
+      const prefix = sessionsKey('');
+      return store
+        .keys(prefix)
+        .sort()
+        .flatMap((key) => readMonth(store, key.slice(prefix.length)));
+    },
   };
 }

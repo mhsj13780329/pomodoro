@@ -26,6 +26,18 @@ class WebStore implements KeyValueStore {
       /* ignore */
     }
   }
+  keys(prefix: string) {
+    try {
+      const out: string[] = [];
+      for (let i = 0; i < this.storage.length; i++) {
+        const k = this.storage.key(i);
+        if (k !== null && k.startsWith(prefix)) out.push(k);
+      }
+      return out;
+    } catch {
+      return [];
+    }
+  }
 }
 
 const PROBE_KEY = 'pomodoro.probe';

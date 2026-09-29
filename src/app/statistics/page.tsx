@@ -1,5 +1,5 @@
-import { PagePlaceholder } from '@/ui/shell/PagePlaceholder';
+import { StatisticsView } from '@/ui/stats/StatisticsView';
 
 export default function StatisticsPage() {
-  return <PagePlaceholder title="page.statistics.title" />;
+  return <StatisticsView />;
 }

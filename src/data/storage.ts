@@ -4,6 +4,8 @@ export interface KeyValueStore {
   /** Returns false when the write failed (quota, blocked storage). */
   set(key: string, value: string): boolean;
   remove(key: string): void;
+  /** Keys starting with `prefix`. Empty when the store cannot be read. */
+  keys(prefix: string): string[];
   /** False when this store is an in-memory fallback and data will not survive reload. */
   readonly persistent: boolean;
 }

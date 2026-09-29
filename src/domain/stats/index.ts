@@ -1,3 +1,4 @@
+export { activityGrid } from './activity';
 export { completedTasksOn, dailySummary, goalProgress } from './daily';
 export { longTermSummary } from './longTerm';
 export { currentStreak, longestStreak } from './streaks';

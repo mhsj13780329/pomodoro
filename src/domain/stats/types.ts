@@ -26,6 +26,11 @@ export interface WeeklySummary {
   totalFocusMs: number;
 }
 
+export interface ActivityCell extends DayTotals {
+  level: 0 | 1 | 2 | 3 | 4;
+  isFuture: boolean;
+}
+
 export type TrendDirection = 'up' | 'down' | 'flat';
 
 export interface Trend {

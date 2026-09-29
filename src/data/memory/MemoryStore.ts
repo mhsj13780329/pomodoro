@@ -13,4 +13,7 @@ export class MemoryStore implements KeyValueStore {
   remove(key: string) {
     this.map.delete(key);
   }
+  keys(prefix: string) {
+    return [...this.map.keys()].filter((k) => k.startsWith(prefix));
+  }
 }

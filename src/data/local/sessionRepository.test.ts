@@ -53,6 +53,17 @@ describe('session repository', () => {
     expect((await tabA.listByLocalDate('2026-03-20')).map((x) => x.id).sort()).toEqual(['a', 'b']);
   });
 
+  it('lists all sessions across months, skipping corrupt months and other keys', async () => {
+    const store = new MemoryStore();
+    const repo = createSessionRepository(store);
+    expect(await repo.listAll()).toEqual([]);
+    await repo.add(s('b', '2026-04-01'));
+    await repo.add(s('a', '2026-03-31'));
+    store.set(sessionsKey('2026-05'), '{bad');
+    store.set('pomodoro.tasks', '[]');
+    expect((await repo.listAll()).map((x) => x.id)).toEqual(['a', 'b']);
+  });
+
   it('does not duplicate the same session id', async () => {
     const repo = createSessionRepository(new MemoryStore());
     await repo.add(s('a', '2026-03-20'));
