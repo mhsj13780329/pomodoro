@@ -275,3 +275,19 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Names:** month and weekday names use `Intl` with `timeZone: 'UTC'` on a date we compute ourselves (Jalali month names from a reference 1400 date converted by `jalaali-js`), never a hand-written table. Digits are left to the `i18n` formatters.
 - **Intl cross-check result (D3 risk):** `jalaali-js` and ICU's Persian calendar agree on every day from 1300 to 1500 AP, so the feared leap-year disagreement did not appear in that range. `jalaali-js` stays the source of truth for arithmetic. The test fails if that ever changes.
 - **Tooling note:** `node_modules` is linked to the repo-local store `.pnpm-store/v10`, so `pnpm add` needed `--store-dir .pnpm-store/v10`.
+
+## M10 notes (statistics domain)
+
+- **Files:** `domain/stats/{types,group,daily,weekly,longTerm,streaks,index}.ts` and `stats.test.ts`. Pure functions; no new dependency.
+- **Inputs:** `PomodoroSession[]` (and `Task[]` for task counts). "Today" and the time zone are always passed in. Nothing reads a clock.
+- **Grouping** uses only the stored `localDate` of work sessions (`totalsByDate`). Breaks are ignored even if they were ever stored.
+- **Focus time** is the sum of `plannedMs`. Only fully completed sessions are recorded, so planned equals actual.
+- **Completed tasks per day:** `Task` stores only `completedAt` (a timestamp), so `dailySummary` takes a `timeZone` and dates it with `localDateOf`. `longTermSummary` takes no time zone: it only counts completed tasks in total.
+- **Averages:** daily average = total focus / calendar days from the first session date to today (inclusive), not active days. Weekly average = total focus / `max(1, ceil(days / 7))`. Both are 0 with no sessions.
+- **Trend:** focus time of the current week against the previous week (week start passed in), with direction `up`, `down` or `flat`.
+- **Weekly:** seven zero-filled days for the week containing the date, each with an activity `level` 0-4 (`ceil(4 * n / max)` for a non-empty day), so the UI holds no logic.
+- **Daily goal:** `goalProgress(completed, goal)`, ratio clamped to 0..1. A goal of 0 or less means no goal (ratio 0, not reached).
+- **History:** `longTermSummary.history` lists active dates only, ascending. The UI (M12, M13) lays it out.
+- **Calendar independence:** nothing here depends on Jalali or Gregorian. Only `weekStart` is a parameter. Tested.
+- **Deviation from the plan:** `longTermSummary` has no `timeZone` parameter (not needed), and per-week task completion counts were not added (not required by the PRD).
+- **Docs:** ARCHITECTURE section 5 now lists signatures and the average rules.
