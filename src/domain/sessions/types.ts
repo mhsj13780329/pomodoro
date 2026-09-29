@@ -1,5 +1,7 @@
 // Minimal type only (PRD section 20). Recording arrives in M6.
-export type SessionType = 'work' | 'shortBreak' | 'longBreak';
+import type { SessionType } from '../timer/types';
+
+export type { SessionType };
 
 export interface PomodoroSession {
   id: string;

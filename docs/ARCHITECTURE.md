@@ -76,8 +76,8 @@ Three complementary mechanisms, none of which needs an extra dependency. All are
 1. **Separate TypeScript project without DOM types.** `tsconfig.domain.json` includes only `src/domain/**` and `src/i18n/**`, with `"lib": ["ES2023"]` (no `DOM`), `"types": []` (no `@types/node`, no React types), and `paths` limited to `domain`. Any reference to `window`, `document`, `localStorage`, `sessionStorage`, `setTimeout`, `process`, or a React import fails to compile. `pnpm typecheck` runs `tsc -p tsconfig.json --noEmit && tsc -p tsconfig.domain.json --noEmit`.
    - `Intl` is in the ES lib, so domain code can format dates and numbers. `setTimeout` is not, and the engine does not need it (see section 4).
    - `Date` exists in ES. See rule 3 for how it is constrained.
-2. **ESLint `no-restricted-imports` for `src/domain/**`** (flat config override, built-in rule only). Forbidden patterns: `react`, `react-dom`, `next`, `next/*`, `@/ui/*`, `@/application/*`, `@/data/*`, `@/platform/*`, `@/app/*`, and `jalaali-js` everywhere except `src/domain/calendar/**`. A second override for `src/ui/**` forbids `@/data/*` and `@/platform/*`, so UI never touches storage directly (PRD section 19). A third for `src/app`, `src/ui`, and `src/application` forbids direct `localStorage`, `sessionStorage` and `window.*Storage` use via `no-restricted-globals` / `no-restricted-properties` (only `src/data/local` and `src/data/session` may use `localStorage` and `sessionStorage`).
-3. **ESLint `no-restricted-syntax` and `no-restricted-properties` in `src/domain/**` for hidden time and randomness**: forbid `Date.now`, `new Date()` with no arguments, `performance.now`, and `Math.random`. Time enters only through the injected `Clock`, and IDs through an injected `IdGenerator`. `new Date(timestamp)` with an argument is allowed for pure conversions.
+2. **ESLint `no-restricted-imports` for `src/domain/**`** (flat config override, built-in rule only). Forbidden patterns: `react`, `react-dom`, `next`, `next/_`, `@/ui/_`, `@/application/_`, `@/data/_`, `@/platform/_`, `@/app/_`, and `jalaali-js`everywhere except`src/domain/calendar/**`. A second override for `src/ui/**`forbids`@/data/_`and`@/platform/_`, so UI never touches storage directly (PRD section 19). A third for `src/app`, `src/ui`, and `src/application`forbids direct`localStorage`, `sessionStorage`and`window.\*Storage`use via`no-restricted-globals`/`no-restricted-properties`(only`src/data/local`and`src/data/session`may use`localStorage`and`sessionStorage`).
+3. **ESLint `no-restricted-syntax` and `no-restricted-properties` in `src/domain/**`for hidden time and randomness**: forbid`Date.now`, `new Date()`with no arguments,`performance.now`, and `Math.random`. Time enters only through the injected `Clock`, and IDs through an injected `IdGenerator`. `new Date(timestamp)` with an argument is allowed for pure conversions.
 
 Additional convention checks, using the same built-in rule:
 
@@ -93,9 +93,9 @@ Location: `src/domain/timer/`. Pure TypeScript, deterministic, independent of Re
 ### 4.1 Types
 
 ```ts
-type SessionType = 'work' | 'shortBreak' | 'longBreak';
+type SessionType = "work" | "shortBreak" | "longBreak";
 
-type TimerStatus = 'idle' | 'running' | 'paused';
+type TimerStatus = "idle" | "running" | "paused";
 
 interface TimerConfig {
   workMs: number;
@@ -109,13 +109,14 @@ interface Clock {
   now(): number; // epoch milliseconds
 }
 
-interface TimerSnapshot {          // immutable; new object per change
+interface TimerSnapshot {
+  // immutable; new object per change
   status: TimerStatus;
-  sessionType: SessionType;        // the current (or upcoming, when idle) session
+  sessionType: SessionType; // the current (or upcoming, when idle) session
   plannedMs: number;
-  remainingMs: number;             // computed from the clock at snapshot time
-  completedWorkInCycle: number;    // 0..sessionsBeforeLongBreak-1
-  version: number;                 // increments on every state change (not on every tick)
+  remainingMs: number; // computed from the clock at snapshot time
+  completedWorkInCycle: number; // 0..sessionsBeforeLongBreak-1
+  version: number; // increments on every state change (not on every tick)
 }
 
 // Serializable subset the application layer may persist and later hand back to restore().
@@ -124,8 +125,8 @@ interface TimerState {
   status: TimerStatus;
   sessionType: SessionType;
   plannedMs: number;
-  endsAt: number | null;           // epoch ms; set when running
-  remainingMs: number | null;      // set when paused
+  endsAt: number | null; // epoch ms; set when running
+  remainingMs: number | null; // set when paused
 }
 
 // What the application layer writes to storage: engine state plus the time of the write.
@@ -133,39 +134,39 @@ interface TimerState {
 // so time spent closed never counts (PRD section 5). The computation is a pure function in
 // domain/timer and does not read the clock.
 interface PersistedTimerState extends TimerState {
-  savedAt: number;                 // epoch ms of the last write
+  savedAt: number; // epoch ms of the last write
 }
 
 type TimerEvent =
-  | { type: 'started';   sessionType: SessionType; at: number }
-  | { type: 'paused';    at: number }
-  | { type: 'resumed';   at: number }
-  | { type: 'reset';     sessionType: SessionType; at: number }
-  | { type: 'skipped';   sessionType: SessionType; at: number }
-  | { type: 'completed'; sessionType: SessionType; plannedMs: number; completedAt: number;
-      restored: boolean }          // true only for the zero-remaining edge case on restore (4.4)
-  | { type: 'transitioned'; from: SessionType; to: SessionType; autoStarted: boolean };
+  | { type: "started"; sessionType: SessionType; at: number }
+  | { type: "paused"; at: number }
+  | { type: "resumed"; at: number }
+  | { type: "reset"; sessionType: SessionType; at: number }
+  | { type: "skipped"; sessionType: SessionType; at: number }
+  | { type: "completed"; sessionType: SessionType; plannedMs: number; completedAt: number; restored: boolean } // true only for the zero-remaining edge case on restore (4.4)
+  | { type: "transitioned"; from: SessionType; to: SessionType; autoStarted: boolean };
 
 interface TimerEngine {
-  getSnapshot(): TimerSnapshot;          // recomputes remainingMs from clock
-  subscribe(listener: () => void): () => void;   // state changes (for useSyncExternalStore)
+  getSnapshot(): TimerSnapshot; // recomputes remainingMs from clock
+  subscribe(listener: () => void): () => void; // state changes (for useSyncExternalStore)
   onEvent(listener: (e: TimerEvent) => void): () => void; // domain events
-  start(): void;                         // idle -> running
-  pause(): void;                         // running -> paused
-  resume(): void;                        // paused -> running
-  reset(): void;                         // running|paused -> idle, same session type, not counted
-  skip(): void;                          // advance to next session type, not counted
-  tick(): void;                          // evaluates the clock; completes the session if due
+  start(): void; // idle -> running
+  pause(): void; // running -> paused
+  resume(): void; // paused -> running
+  reset(): void; // running|paused -> idle, same session type, not counted
+  skip(): void; // advance to next session type, not counted
+  tick(): void; // evaluates the clock; completes the session if due
   updateConfig(config: TimerConfig): void; // applies to the NEXT session
-  getState(): TimerState;                // serializable; the application layer adds savedAt and persists (per tab)
+  getState(): TimerState; // serializable; the application layer adds savedAt and persists (per tab)
   setCompletedWorkInCycle(n: number): void; // only while idle; see 4.6
 }
 
 function createTimerEngine(deps: {
   clock: Clock;
   config: TimerConfig;
-  restore?: PersistedTimerState;         // optional state persisted by a previous page load
-  completedWorkInCycle?: number;         // derived by the caller from today's sessions; default 0
+  restore?: PersistedTimerState; // optional state persisted by a previous page load
+  completedWorkInCycle?: number; // derived by the caller from today's sessions; default 0
+  onEvent?: (e: TimerEvent) => void; // registered before construction, so the restore edge case (4.4) is observable
 }): TimerEngine;
 
 // domain/sessions
@@ -180,7 +181,7 @@ The engine has no `setInterval` and no `setTimeout`. It never schedules itself. 
 - While running the engine stores `endsAt` (epoch ms). `remainingMs = max(0, endsAt - clock.now())`. Nothing is ever decremented.
 - On `pause`, store `remainingMs = endsAt - now` and clear `endsAt`. On `resume`, set `endsAt = now + remainingMs`. Pause may last indefinitely.
 - `start` sets `endsAt = now + plannedMs`.
-- `tick()` (and `getSnapshot()`) with `now >= endsAt` triggers completion exactly once.
+- `tick()` with `now >= endsAt` triggers completion exactly once. `getSnapshot()` is pure (it reports `remainingMs = 0` when due but never completes), because it runs during React render.
 - Clock goes backwards (manual system-clock change): `remainingMs` is clamped to `plannedMs` at most. The engine does not crash. This is an accepted edge case; document it in the test suite.
 
 ### 4.3 Injected clock

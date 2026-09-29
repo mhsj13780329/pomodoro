@@ -175,7 +175,7 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Invented v0 fixture:** no released v0 exists. v0 is defined as a legacy flat settings blob (`{ theme, language, workMinutes, ..., autoStart }`); v1 is the nested `UserSettings` shape. This only exercises the migration runner.
 - **Theme is `system | light | dark`** (default `system`). The toggle sets an explicit light or dark. The choice is mirrored to the `pomodoro-theme` cookie so the server renders the `dark` class on first paint. Only first-time visitors or `system` use the inline `matchMedia` script. A user with stored settings but no cookie (before this change) sees one possible flash.
 - **Layout is now dynamic** because it reads the cookie (M3 needs this for the locale cookie anyway).
-- **Repository ports for tasks, sessions, timer state and goal** are minimal, and their entity types are minimal type-only files (`domain/tasks`, `sessions`, `goals`, `timer/persisted.ts`). The milestone that implements each one refines them. M4 should move `PersistedTimerState` next to the engine types.
+- **Repository ports for tasks, sessions, timer state and goal** are minimal, and their entity types are minimal type-only files (`domain/tasks`, `sessions`, `goals`). The milestone that implements each one refines them. (`PersistedTimerState` moved into `domain/timer/types.ts` in M4.)
 - **Settings durations are stored in minutes** (user units); the timer converts to ms. Normalization clamps: work 1-180, short break 1-60, long break 1-120, sessions before long break 1-12.
 - **Storage fallback:** if storage is unavailable, stores fall back to memory and expose `persistent: false`. The non-blocking notice UI is deferred to M17.
 - **Storage lint rule** (`no-restricted-globals` and properties) now also covers `src/platform`. Verified once with a temporary bad import in `src/ui`, then removed.
@@ -191,3 +191,16 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Temporary language switch:** `LanguageSwitch` is in the desktop sidebar and on the `/settings` placeholder (mobile only, since mobile has no sidebar). Replaced in M16.
 - **No plurals or missing-param handling beyond `{name}` interpolation:** no message needs them yet. No message uses a placeholder yet, so `translate` interpolation is untested until one does.
 - **Unknown locale cookie values** fall back to Persian.
+
+## M4 notes
+
+- **Construction-time events:** `createTimerEngine` takes an optional `onEvent` dep. The zero-remaining restore edge case completes during construction, before anyone can call `engine.onEvent`, so the caller passes its subscriber in the deps. No event buffering.
+- **`getSnapshot()` is pure:** it reports `remainingMs = 0` when due but never completes a session; only `tick()` does. It is called during React render, where side effects are unsafe. This differs from the wording in ARCHITECTURE 4.2 (now corrected).
+- **Cycle counter resets when the long break ends or is skipped** (as ARCHITECTURE 4.6 says). During the long break the snapshot counter equals `sessionsBeforeLongBreak`, one past the `0..n-1` range, and `setCompletedWorkInCycle` is ignored while idle on a long break so the app layer's derived `count mod n` cannot zero it early.
+- **Skipping work goes to a short break** (the counter is untouched, so a skip never leads to a long break). Skipping any break goes to work. `skip` also works while idle.
+- **`tick()` notifies subscribers** when the displayed remaining time changed, not only on state changes, so `useSyncExternalStore` repaints. `version` still changes only on state changes, and snapshots keep their identity while `(version, remainingMs)` is unchanged.
+- **Auto-start emits no separate `started` event:** `transitioned.autoStarted` carries it. Event order on completion is `completed`, `transitioned`.
+- **Idle durations follow the config:** `updateConfig` refreshes `plannedMs` of an idle upcoming session, and an idle restore takes `plannedMs` from the current config. Running and paused sessions are never altered.
+- **Restore validates input:** `restoreTimerState` accepts `unknown`. Anything that is not a valid `PersistedTimerState` becomes a fresh idle work timer (M5's "corrupt state" criterion). A paused state with 0 remaining also completes on restore, with `completedAt = savedAt`.
+- **Extras beyond the listed scope:** `timerConfigFromSettings` (minutes to ms), `countWorkSessionsOn` (today's work sessions, so the cycle counter is testable across a day boundary), and `platform/clock.ts` (`systemClock`). `FakeClock` lives in `domain/timer/testing.ts`.
+- **`SessionType`** is defined once in `domain/timer/types.ts` and re-exported from `domain/sessions/types.ts`.

@@ -2,7 +2,7 @@ import type { Goal } from '../goals/types';
 import type { PomodoroSession } from '../sessions/types';
 import type { SettingsPatch, UserSettings } from '../settings/types';
 import type { Task } from '../tasks/types';
-import type { PersistedTimerState } from '../timer/persisted';
+import type { PersistedTimerState } from '../timer/types';
 
 // Ports only. Every method is async so a future IndexedDB or cloud repository is a drop-in.
 // Writes are operation-level read-modify-write against current storage, never a cached copy.
