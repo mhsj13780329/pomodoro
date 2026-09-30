@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useT } from '@/application/providers/LocaleProvider';
+import { useSettings } from '@/application/providers/SettingsProvider';
 import { useTimer } from '@/application/timer/TimerProvider';
 import { TodayCard } from '../stats/TodayCard';
 import { SelectedTaskZone } from '../tasks/SelectedTaskZone';
 import { TasksDrawer } from '../tasks/TasksDrawer';
+import { AnalogTimer } from './AnalogTimer';
 import { DigitalTimer } from './DigitalTimer';
 import { ResetDialog } from './ResetDialog';
 import { SessionIndicator } from './SessionIndicator';
@@ -13,8 +15,10 @@ import { TimerControls } from './TimerControls';
 
 export function TimerView() {
   const { t } = useT();
+  const { settings } = useSettings();
   const timer = useTimer();
   const [confirmingReset, setConfirmingReset] = useState(false);
+  const analog = settings.visualization === 'analog';
 
   return (
     <>
@@ -27,7 +31,7 @@ export function TimerView() {
           <SelectedTaskZone readOnly centered />
         </div>
         <SessionIndicator snapshot={timer.snapshot} restoredPaused={timer.restoredPaused} />
-        <DigitalTimer snapshot={timer.snapshot} />
+        {analog ? <AnalogTimer snapshot={timer.snapshot} /> : <DigitalTimer snapshot={timer.snapshot} />}
         <TimerControls
           snapshot={timer.snapshot}
           restoredPaused={timer.restoredPaused}

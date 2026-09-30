@@ -2,13 +2,14 @@
 
 import { useT } from '@/application/providers/LocaleProvider';
 import { useSettings } from '@/application/providers/SettingsProvider';
-import type { CalendarSystem, NumeralSystem } from '@/domain/settings';
+import type { CalendarSystem, NumeralSystem, Visualization } from '@/domain/settings';
 import { SegmentedControl } from '../primitives/SegmentedControl';
 
 const numerals: NumeralSystem[] = ['persian', 'latin'];
 const calendars: CalendarSystem[] = ['jalali', 'gregorian'];
+const visualizations: Visualization[] = ['digital', 'analog'];
 
-/** Numerals and calendar, each independent of the language. Temporary home until M16. */
+/** Numerals, calendar, and timer visualization. Temporary home until M16. */
 export function DisplayControls() {
   const { settings, updateSettings } = useSettings();
   const { t } = useT();
@@ -16,6 +17,12 @@ export function DisplayControls() {
 
   return (
     <div className="flex max-w-xs flex-col gap-4">
+      <SegmentedControl
+        label={t('settings.visualization.label')}
+        value={settings.visualization}
+        onChange={(value) => updateSettings({ visualization: value })}
+        options={visualizations.map((value) => ({ value, label: t(`settings.visualization.${value}`) }))}
+      />
       <SegmentedControl
         label={t('settings.numerals.label')}
         value={settings.numerals}

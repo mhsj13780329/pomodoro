@@ -324,3 +324,12 @@ These fill gaps in `PRD.md`. They are binding, and supplement the PRD where it i
 - **Numerals:** already applied everywhere through `formatNumber` / `formatClock` / `formatDuration`. The new `/settings` control is the missing piece from the M3 note. Tests cover `fa`+Latin and `en`+Persian for clock and duration.
 - **No new dependency.**
 
+## M14 notes (analog timer visualization)
+
+- **Temporary switch on `/settings`.** Digital/analog is a `SegmentedControl` on the settings placeholder, next to numerals and calendar. It writes `settings.visualization` (already persisted since M2). No switch on the timer face. M16 owns the Appearance layout.
+- **Hands show remaining time as clock time**, not the time of day and not a progress ring. Whole seconds use the same `ceil` as `formatClock`. Hour, minute and second hands on a 12-hour face (work can be up to 180 minutes). Face numerals follow the numeral setting. The face does not mirror in RTL; 12 stays at the top.
+- **Motion.** Angles update from the snapshot (~250 ms while running) with a short `motion-safe` transform transition. No infinite CSS sweep. `prefers-reduced-motion` jumps the hands (`motion-reduce:transition-none` plus the global reduced-motion rule).
+- **A11y.** Analog uses the same `role="timer"` and `timer.remaining` label as digital.
+- **No engine changes.** Angle math is a pure helper next to the visualization (`ui/timer/analogHands.ts`).
+- **Doc drift.** The MILESTONES intro still says the full Settings UI is M17. The section that owns it is M16 (M17 is polish). Not corrected in that file in this milestone; M16 will replace the temporary controls.
+
